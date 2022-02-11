@@ -2,6 +2,8 @@ const cards = document.querySelectorAll('.card');
 let hasFlippedCard = false;
 let firstCard, secondCard;
 let lockBoard = false;
+let countMatches = 0;
+let countFlips = 0;
 
 //função para virar carta
 function flipCard() {
@@ -17,12 +19,23 @@ function flipCard() {
 
     secondCard = this;
     hasFlippedCard = false;
+    countFlips++;
     checkForMatch();
+
+    if (countMatches == 6) {
+        setTimeout(() => {
+            var resultado = confirm(`Parabéns\nVocê finalizaou o jogo em ${countFlips} jogadas. Deseja jogar novamente?`)
+            if (resultado === true) {
+                startGame();
+            }
+        }, 1000);
+    }
 }
 
 //função que checa se as cartas são iguais
 function checkForMatch() {
     if(firstCard.dataset.card === secondCard.dataset.card) {
+        countMatches++;
         disableCards();
         return;
     }
@@ -57,14 +70,33 @@ function resetBoard() {
 }
 
 //função que embaralha as cartas
-(function shuffle() {
+function shuffle() {
     cards.forEach((card) => {
         let ramdomPosition = Math.floor(Math.random() * 12);
         card.style.order = ramdomPosition;
     })
-})();
+};
 
-//adiciona evento de clique na carta
-cards.forEach((card) => {
-    card.addEventListener('click', flipCard)
-});
+function startGame() {
+
+    countFlips = 0;
+    countMatches = 0;
+
+    resetBoard();
+
+    cards.forEach((card) => {
+        card.classList.remove('flip');
+    });
+
+    setTimeout(() => {
+        shuffle();
+    }, 500);
+
+    cards.forEach((card) => {
+        //adiciona evento de clique na carta
+        card.addEventListener('click', flipCard)
+    });
+
+}
+
+startGame();
